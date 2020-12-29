@@ -1,0 +1,41 @@
+version: "3"
+services:
+  nginx:
+    depends_on: 
+      - apps
+    image: nginx:1.17-alpine
+    container_name: seaniadmin-nginx
+    restart: unless-stopped
+    ports:
+      - 4000:80
+    volumes:
+      - ./seaniadmin:/var/www
+      - ./nginx:/etc/nginx/conf.d
+      - ./seaniadmin/public/storage:/var/www/public/storage
+    networks:
+      - opennetwork
+
+
+  apps:
+    build:
+      args:
+        user: avatardev
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: seaniadmin
+    container_name: seaniadmin-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./seaniadmin:/var/www
+    networks:
+      - opennetwork
+
+networks:
+  opennetwork:
+    external: true
+
+volumes:
+  dbdata:
+    driver: local
